@@ -3,13 +3,12 @@ services:
     container_name: callback
     build:
       context: ./callback
-      target: prod
+      target: callback-yt-prod
     volumes:
       - "media:/yt-media"
-      - "./callback/app:/app"
     ports:
-      - "5000:5000"
       - "80:80"
+    stop_signal: SIGINT
 
 volumes:
   media:

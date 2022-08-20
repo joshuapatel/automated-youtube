@@ -1,2 +1,3 @@
 .vscode/*
 callback/app/.env/*
+callback/app/__pycache__/*
