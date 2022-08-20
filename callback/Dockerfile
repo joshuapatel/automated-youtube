@@ -20,7 +20,7 @@ VOLUME ["/app"]
 EXPOSE 5000
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
 
-FROM alpine:3.16.2 AS yt-build
+FROM alpine:latest AS yt-build
 
 # inspired by https://github.com/tnk4on/yt-dlp/blob/main/Containerfile.d/Containerfile.alpine-static
 
