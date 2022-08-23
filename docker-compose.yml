@@ -4,6 +4,8 @@ services:
     build:
       context: ./callback
       target: callback-yt-prod
+    environment:
+      - "AUDIO_YOUTUBE_TOKEN=none specified"
     volumes:
       - "media:/yt-media"
     ports:

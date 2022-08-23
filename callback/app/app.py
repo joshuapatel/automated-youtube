@@ -1,4 +1,5 @@
 import subprocess
+from os import environ
 
 import xmltodict
 from flask import Flask, jsonify, request
@@ -8,8 +9,23 @@ from werkzeug.exceptions import BadRequest, HTTPException
 
 app = Flask(__name__)
 
-@app.route("/callback/audio-youtube", methods=["POST"]) 
+def verify_subscription(req, token: str) -> Response:
+    if req.args.get("hub.mode") in ["subscribe", "unsubscribe"]:
+        if req.args.get("hub.verify_token") == token:
+            if req.args.get("hub.challenge"):
+                return req.args.get("hub.challenge")
+            else:
+                raise BadRequest("Missing challenge")
+        else:
+            raise BadRequest("Invalid token")
+    else:
+        raise BadRequest("Invalid mode")
+
+@app.route("/callback/audio-youtube", methods=["GET", "POST"]) 
 def audio_youtube() -> Response:
+    if request.method == "GET":
+        return verify_subscription(request, environ.get("AUDIO_YOUTUBE_TOKEN", default="none specified"))
+
     try:
         data = xmltodict.parse(request.data)
     except ExpatError:
@@ -23,7 +39,7 @@ def audio_youtube() -> Response:
         raise BadRequest("XML data is missing required fields")
 
     subprocess.Popen(["yt-dlp", "--write-thumbnail", "--write-info-json",
-    "-x", "--audio-format", "flac", "--audio-quality","0",
+    "-x", "--audio-format", "flac", "--audio-quality", "0",
     "--output", "/yt-media/%(title)s [%(id)s].%(ext)s", "https://www.youtube.com/watch?v=" + video_id])
 
     return Response(status=204)
