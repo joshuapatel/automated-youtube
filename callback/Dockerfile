@@ -22,6 +22,8 @@ CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
 
 FROM alpine:latest AS yt-build
 
+ARG TARGETARCH
+
 # inspired by https://github.com/tnk4on/yt-dlp/blob/main/Containerfile.d/Containerfile.alpine-static
 
 ENV YTDLP_VERSION=2022.08.19
@@ -37,12 +39,11 @@ RUN wget https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/SHA
 
 # ffmpeg static source (https://johnvansickle.com/ffmpeg/)
 # "ffmpeg"
-RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
-    && wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5 \
-    && md5sum -c ffmpeg-release-amd64-static.tar.xz.md5 \
-    && tar Jxf ffmpeg-release-amd64-static.tar.xz
-
-RUN mv ffmpeg-${FFMPEG_VERSION}-amd64-static/ffmpeg ffmpeg
+RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${TARGETARCH}-static.tar.xz \
+    && wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${TARGETARCH}-static.tar.xz.md5 \
+    && md5sum -c ffmpeg-release-${TARGETARCH}-static.tar.xz.md5 \
+    && tar Jxf ffmpeg-release-${TARGETARCH}-static.tar.xz \
+    && mv ffmpeg-${FFMPEG_VERSION}-${TARGETARCH}-static/ffmpeg ffmpeg
 
 FROM callback-prod AS callback-yt-prod
 
